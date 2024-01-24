@@ -2,20 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-enum Light
+public enum LightType
 {
     NONE,
     REM_READER,
     MILKOTOV,
 }
 
-enum Medium
+public enum MediumType
 {
     NONE,
     BK47,
 }
 
-enum Heavy
+public enum HeavyType
 {
     NONE,
     RPG,
@@ -23,5 +23,5 @@ enum Heavy
 
 public class WeaponController : MonoBehaviour
 {
-    (Light, Light, Medium) equippedWeapons = (Light.NONE, Light.NONE, Medium.NONE);
+    private (LightType, LightType, MediumType) equippedWeapons = (LightType.NONE, LightType.NONE, MediumType.NONE);
 }

@@ -7,18 +7,24 @@ public class PlayerController : MonoBehaviour
     public float acceleration = 50f;
     public float walkSpeed = 10f;
     public float sprintSpeed = 20f;
-    public float airSpeed = 1f;
+    public float airSpeed = 0f;
     public float jumpForce = 20f;
 
     [Header("Camera")]
     public float sensitivity = 2f;
-
     private Camera cam;
-    private Rigidbody rb;
-    private bool grounded = false;
-    private float currSpeed;
 
+    private Rigidbody rb;
+    private float currSpeed;
+    private bool grounded = false;
+    private Vector3 movement;
+    private Vector3 velocity;
     private Vector2 rotation = Vector2.zero;
+    
+    [SerializeField]
+    private Vector3 rigidbodyVelocityVector;
+    [SerializeField]
+    private float rigidbodyVelocityMagnitude;
 
     void Start()
     {
@@ -34,9 +40,14 @@ public class PlayerController : MonoBehaviour
     {
         grounded = rb.velocity.y == 0;
 
-        UpdateSpeed();
+        // this looks cleaner than the nested ternary
+        if (grounded)
+            currSpeed = Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed;
+        else
+            currSpeed = airSpeed;
 
-        HandleJump();
+        rigidbodyVelocityVector = rb.velocity;
+        rigidbodyVelocityMagnitude = rb.velocity.magnitude;
 
         HandleMouseInput();
     }
@@ -44,19 +55,6 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         HandleMovement();
-    }
-
-    void UpdateSpeed()
-    {
-        currSpeed = grounded ? (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed) : airSpeed;
-    }
-
-    void HandleJump()
-    {
-        if (Input.GetKeyDown(KeyCode.Space) && grounded)
-        {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        }
     }
 
     void HandleMouseInput()
@@ -78,8 +76,8 @@ public class PlayerController : MonoBehaviour
         float inputX = Input.GetAxisRaw("Horizontal");
         float inputY = Input.GetAxisRaw("Vertical");
 
-        Vector3 movement = new Vector3(inputX, 0, inputY);
-        Vector3 velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+        movement = new Vector3(inputX, 0, inputY);
+        velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
 
         movement.Normalize();
         movement *= acceleration * Time.fixedDeltaTime;
